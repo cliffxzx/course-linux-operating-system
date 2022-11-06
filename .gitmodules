@@ -1,0 +1,6 @@
+[submodule "project1/busybox"]
+	path = project1/busybox
+	url = https://github.com/mirror/busybox.git
+[submodule "linux"]
+	path = project1/linux
+	url = git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git

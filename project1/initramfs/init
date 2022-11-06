@@ -1,0 +1,11 @@
+#!/bin/sh
+
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+echo -e "\nBoot took $(cut -d' ' -f1 /proc/uptime) seconds\n"
+
+mkdir -p /mnt/host_share
+mount -t 9p -o trans=virtio host_share /mnt/host_share -oversion=9p2000.L
+
+exec /bin/sh -c '/mnt/host_share/main; exec sh'

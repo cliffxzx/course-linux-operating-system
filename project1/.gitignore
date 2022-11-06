@@ -1,0 +1,5 @@
+main
+
+**/initramfs/**
+!**/initramfs/init
+
