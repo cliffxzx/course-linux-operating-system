@@ -15,6 +15,7 @@ char *heap;                     // heap
 char *mmmap;                    // mmap
 char *code() { return "code"; } // code
 
+// there's a function `find_vma_intersection` in kernel
 char intersect(unsigned long a1, unsigned long a2, unsigned long b1, unsigned long b2)
 {
   return (b2 > a1 && b2 <= a2) || (b1 >= a1 && b1 < a2) || (b1 <= a1 && b2 > a2);
@@ -24,15 +25,21 @@ void print_segment_info(char *thread_name)
 {
   setvbuf(stdout, NULL, _IOFBF, 16384);
   char stack[6] = "stack"; // stack
+  if(!strcmp(thread_name, "main")) {
+    heap = (char *)malloc(sizeof(char) * 5);
+    mmmap = mmap(NULL, 5 * sizeof(char), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
+    strcpy(heap, "heap");
+    strcpy(mmmap, "mmap");
+  }
 
   struct segment_info si;
   printf("˅˅˅˅˅˅˅˅˅˅˅˅˅˅˅ [User Mode] %s thread id: %d ˅˅˅˅˅˅˅˅˅˅˅˅˅˅\n", thread_name, syscall(451, &si));
-  printf(">>>>>> [%s]:\t\t'%p'\n", code(), &code);
-  printf(">>>>>> [%s]:\t\t'%p'\n", data, &data);
-  printf(">>>>>> [%s]:\t\t'%p'\n", bss, &bss);
-  printf(">>>>>> [%s]:\t\t'%p'\n", heap, heap);
-  printf(">>>>>> [%s]:\t\t'%p'\n", mmmap, mmmap);
-  printf(">>>>>> [%s]:\t\t'%p'\n", stack, &stack);
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", code(), &code, syscall(452, &code));
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", data, &data, syscall(452, &data));
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", bss, &bss, syscall(452, &bss));
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", heap, heap, syscall(452, heap));
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", mmmap, mmmap, syscall(452, mmmap));
+  printf(">>>>>> [%s]:\t\t'%p' -> '%p'\n", stack, &stack, syscall(452, &stack));
   printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
   printf(">>>>>> <start_code>:\t'%p'\n", si.start_code);
   printf(">>>>>> <end_code>:\t'%p'\n", si.end_code);
@@ -72,12 +79,7 @@ void print_segment_info(char *thread_name)
 
 int main()
 {
-  heap = (char *)malloc(sizeof(char) * 5);
-  mmmap = mmap(NULL, 5 * sizeof(char), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
   strcpy(bss, "bss");
-  strcpy(heap, "heap");
-  strcpy(mmmap, "mmap");
-
   print_segment_info("main");
 
   pthread_t t1, t2;

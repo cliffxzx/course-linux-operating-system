@@ -4,9 +4,16 @@
 #include <linux/sched.h>
 #include <linux/ptrace.h>
 #include <linux/thread_info.h>
+#include <linux/mm.h>
+#include <linux/io.h>
 #include <asm/current.h>
 
 #include <linux/segment_info.h>
+
+SYSCALL_DEFINE1(virt_to_phys, unsigned long, vaddr)
+{
+  return page_to_phys(follow_page(current->mm->mmap, vaddr, 0));
+}
 
 SYSCALL_DEFINE1(segment_info, struct segment_info *, dsi)
 {

@@ -14,7 +14,7 @@
 ### Compile Linux Kernel 6.0.5
 
 ```shell
-PROJECT=/home/cliff/projects/course-linux-operation-system/project1
+PROJECT=/home/cliff/projects/course-linux-operating-system/project1
 cd $PROJECT
 
 # Install compile tools
